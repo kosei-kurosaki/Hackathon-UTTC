@@ -15,4 +15,4 @@ RUN go mod download
 Run go build -v main.go
 
 # コンテナ起動時に実行するコマンドを指定
-CMD ["go","run","main.go"]
+CMD["app/main"]

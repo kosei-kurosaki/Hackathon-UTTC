@@ -42,12 +42,52 @@ func init() {
 
 }
 
-type UserResForHTTPGet struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Age  int    `json:"age"`
-}
+// type UserResForHTTPGet struct {
+// 	ID   string `json:"id"`
+// 	Name string `json:"name"`
+// 	Age  int    `json:"age"`
+// }
+type Message struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Message   string `json:"message"`
+	Timestamp string `json:"timestamp"`
+  }
 
+var messages []Message
+
+func getMessages(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(messages)
+  }
+  
+
+  func updateMessage(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+  
+	for index, msg := range messages {
+	  if msg.ID == id {
+		var updatedMessage Message
+		_ = json.NewDecoder(r.Body).Decode(&updatedMessage)
+		messages[index].Message = updatedMessage.Message
+		json.NewEncoder(w).Encode(messages[index])
+		return
+	  }
+	}
+	http.Error(w, "Message not found", http.StatusNotFound)
+  }
+  
+  func main() {
+	router := mux.NewRouter()
+	messages = append(messages, Message{ID: "1", Name: "John Doe", Message: "Hello, world!", Timestamp: "2023-06-07T09:30:00Z"})
+  
+	router.HandleFunc("/messages", getMessages).Methods("GET")
+	router.HandleFunc("/messages/{id}", updateMessage).Methods("PUT")
+  
+	log.Fatal(http.ListenAndServe(":8003", router))
+  }
+  
 // 2
 //Func getDBConnectionString() string {
 //	mysqlUser := os.Getenv("MYSQL_USER")
@@ -80,34 +120,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		//2--1
-		//nameの取得
-		//name := r.URL.Query().Get("name") // To be filled
-		////nameが長すぎるか空ならエラー
-		//if name == "" {
-		//	log.Println("fail: name is empty")
-		//	w.WriteHeader(http.StatusBadRequest)
-		//	return
-		//}
-		//
-		//f len(name) > 50 {
-		//	w.WriteHeader(http.StatusBadRequest)
-		//	return
-		//}
-		////ageの取得
-		//age := r.URL.Query().Get("age") // To be filled
-		////ageが範囲外ならエラー
-		//intage, err := strconv.Atoi(age)
-		//if age == "" {
-		//	log.Println("fail: age is empty")
-		//	w.WriteHeader(http.StatusBadRequest)
-		//	return
-		//}
-		//if intage < 20 || intage > 80 {
-		//	w.WriteHeader(http.StatusBadRequest)
-		//	return
-		//}
-		//2-2
+
+
 		rows, err := db.Query("SELECT id, name, age FROM user")
 
 		if err != nil {
