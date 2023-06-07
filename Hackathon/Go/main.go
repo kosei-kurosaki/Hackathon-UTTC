@@ -26,7 +26,7 @@ func init() {
 	//1-1
 	mysqlUser := os.Getenv("MYSQL_USER")
 	mysqlUserPwd := os.Getenv("MYSQL_PASSWORD")
-	mysqlHost := os.Getenv("MYSQL_HOST")
+	// mysqlHost := os.Getenv("MYSQL_HOST")
 	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
 
 	//1-2
@@ -49,7 +49,7 @@ type UserResForHTTPGet struct {
 }
 
 // 2
-//Func getDBConnectionString() string {
+//func getDBConnectionString() string {
 //	mysqlUser := os.Getenv("MYSQL_USER")
 //	mysqlUserPwd := os.Getenv("MYSQL_USER_PWD")
 //	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
