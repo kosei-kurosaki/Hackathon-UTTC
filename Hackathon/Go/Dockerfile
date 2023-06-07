@@ -14,6 +14,5 @@ RUN go mod download
 
 Run go build -v main.go
 
-EXPOSE 8008
 # コンテナ起動時に実行するコマンドを指定
 CMD ["go","run","main.go"]
