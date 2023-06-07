@@ -26,11 +26,11 @@ func init() {
 	//1-1
 	mysqlUser := os.Getenv("MYSQL_USER")
 	mysqlUserPwd := os.Getenv("MYSQL_PASSWORD")
-	// mysqlHost := os.Getenv("MYSQL_HOST")
+	mysqlHost := os.Getenv("MYSQL_HOST")
 	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
 
 	//1-2
-	_db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@(localhost:3306)/%s", mysqlUser, mysqlUserPwd, mysqlDatabase))
+	_db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@(localhost:3306)/%s", mysqlUser, mysqlUserPwd,mysqlHost, mysqlDatabase))
 	if err != nil {
 		log.Fatalf("fail: sql.Open, %v\n", err)
 	}
@@ -80,7 +80,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		//2-1
+		//2--1
 		//nameの取得
 		//name := r.URL.Query().Get("name") // To be filled
 		////nameが長すぎるか空ならエラー
@@ -90,7 +90,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		//	return
 		//}
 		//
-		//if len(name) > 50 {
+		//f len(name) > 50 {
 		//	w.WriteHeader(http.StatusBadRequest)
 		//	return
 		//}
