@@ -49,7 +49,7 @@ type UserResForHTTPGet struct {
 }
 
 // 2
-//func getDBConnectionString() string {
+//Func getDBConnectionString() string {
 //	mysqlUser := os.Getenv("MYSQL_USER")
 //	mysqlUserPwd := os.Getenv("MYSQL_USER_PWD")
 //	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
