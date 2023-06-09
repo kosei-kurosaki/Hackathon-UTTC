@@ -5,14 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
 	"github.com/oklog/ulid/v2"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
-	"strconv"
 	_ "strconv"
 	"time"
 )
@@ -46,6 +43,12 @@ type Message struct {
 	Message   string `json:"message"`
 	Timestamp string `json:"timestamp"`
 	UserID    string `json:"userid"`
+	ChannelId string `json:"channelid"`
+}
+
+type MessageEdit struct {
+	ID      string `json:"id"`
+	Message string `json:"message"`
 }
 
 type NewMessage struct {
@@ -61,18 +64,16 @@ var messages []Message
 func getMessages(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query("SELECT * FROM messages")
-
 	if err != nil {
 		log.Printf("fail: db.Query, %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 	//2-3
 	messages := make([]Message, 0)
 	for rows.Next() {
 		var m Message
-		if err := rows.Scan(&m.ID, &m.Name, &m.Message, &m.Timestamp, &m.UserID); err != nil {
+		if err := rows.Scan(&m.ID, &m.Name, &m.Message, &m.Timestamp, &m.UserID, &m.ChannelId); err != nil {
 			log.Printf("fail: rows.Scan, %v\n", err)
 
 			if err := rows.Close(); err != nil { // 500を返して終了するが、その前にrowsのClose処理が必要
@@ -103,50 +104,49 @@ func getMessages(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func handlePostMessage(w http.ResponseWriter, r *http.Request) {
-	var msg Message
-	// リクエストボディからメッセージをデコード
+func updateMessage(w http.ResponseWriter, r *http.Request) {
+	// リクエストからMessageを取得
+	var msg MessageEdit
 	err := json.NewDecoder(r.Body).Decode(&msg)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	// メッセージをデータベースに保存するコードを後で書
-
-	// レスポンスとしてメッセージをエンコードしてクライアントに送信
-	json.NewEncoder(w).Encode(msg)
-}
-
-func updateMessage(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	for index, msg := range messages {
-		if msg.ID == id {
-			var updatedMessage Message
-			_ = json.NewDecoder(r.Body).Decode(&updatedMessage)
-			messages[index].Message = updatedMessage.Message
-			json.NewEncoder(w).Encode(messages[index])
-			return
-		}
+	// データベースのメッセージを更新
+	_, err = db.Exec(`UPDATE messages SET message = ? WHERE id = ?`, msg.Message, msg.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	http.Error(w, "Message not found", http.StatusNotFound)
+
 }
 
 func postMessage(w http.ResponseWriter, r *http.Request) {
-	var newMessage NewMessage
-	reqBody, _ := ioutil.ReadAll(r.Body)
-	json.Unmarshal(reqBody, &newMessage)
-	//aa
-	// You might want to use real timestamp and user name here
-	newMessage.Timestamp = time.Now().Format(time.RFC3339)
-	newMessage.Name = "Some User"
+	// リクエストからMessageを取得
+	var msg Message
+	err := json.NewDecoder(r.Body).Decode(&msg)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	newID++
-	messages = append(messages, Message{ID: strconv.Itoa(newID), Name: newMessage.Name, Message: newMessage.Message, Timestamp: newMessage.Timestamp})
+	// Timestampの設定
+	msg.Timestamp = time.Now().Format(time.RFC3339)
+	//IDの設定
+	msg.ID = generateID()
+	// データベースへの書き込み
+	_, err = db.Exec(`INSERT INTO messages (id, name, message, timestamp, userid, channelid) VALUES (?, ?, ?, ?, ?, ?)`,
+		msg.ID, msg.Name, msg.Message, msg.Timestamp, msg.UserID, msg.ChannelId)
 
-	json.NewEncoder(w).Encode(newMessage)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// レスポンスの作成と送信
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(msg)
 }
 
 func generateID() string {
