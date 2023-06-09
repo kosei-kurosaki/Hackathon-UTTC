@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
 	"github.com/oklog/ulid/v2"
 	"log"
 	"math/rand"
@@ -120,10 +119,10 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 	//	http.Error(w, err.Error(), http.StatusInternalServerError)
 	//	return
 	//}
-	params := mux.Vars(r)
 
 	// リクエストボディからデータを読み込みます
-	var updatedMessage Message
+	// リクエストボディからデータを読み込みます
+	var updatedMessage MessageEdit
 	err := json.NewDecoder(r.Body).Decode(&updatedMessage)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -131,14 +130,14 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// SQLクエリを実行します
-	stmt, err := db.Prepare("UPDATE messages SET Message = ? WHERE ID = ?")
+	stmt, err := db.Prepare("UPDATE messages SET Message = updatedMessage.message WHERE ID = updatedMessage.id")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(updatedMessage.Message, params["editingMessageId"])
+	_, err = stmt.Exec(updatedMessage.Message, updatedMessage.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
