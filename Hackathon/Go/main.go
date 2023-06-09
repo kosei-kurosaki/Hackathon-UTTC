@@ -157,10 +157,9 @@ func generateID() string {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:59171")
-	w.Header().Set("Access-Control-Allow-Origin", "https://hackathon-uttc-ngo5uabimq-uc.a.run.app")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method == "OPTIONS" {
@@ -193,16 +192,15 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	router := mux.NewRouter()
-	router.HandleFunc("/messages", handler)
-	router.HandleFunc("/hello", helloHandler)
+	http.HandleFunc("/messages", handler)
+	http.HandleFunc("/hello", helloHandler)
 	//router.HandleFunc("/messages", handlePostMessage)
 	//router.HandleFunc("/messages", getMessages).Methods("GET")
 	//router.HandleFunc("/messages/{id}", updateMessage).Methods("PUT")
 	//router.HandleFunc("/messages", postMessage).Methods("POST")
 
 	log.Println("Listening...")
-	if err:= http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal(err)
 	}
 }
