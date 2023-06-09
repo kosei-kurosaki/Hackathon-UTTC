@@ -28,14 +28,14 @@ func init() {
 	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
 	//1-2
 
-	_db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s/%s?parseTime=true", mysqlUser, mysqlUserPwd, mysqlHost, mysqlDatabase))
+	dsn := fmt.Sprintf("%s:%s@%s/%s?parseTime=true", mysqlUser, mysqlUserPwd, mysqlHost, mysqlDatabase)
+	_db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalf("fail: sql.Open, %v\n", err)
 	}
 	//1-3
 	if err := _db.Ping(); err != nil {
 		log.Fatalf("fail: _db.Ping, %v\n", err)
-
 	}
 	db = _db
 }
