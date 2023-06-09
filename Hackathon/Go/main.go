@@ -138,7 +138,7 @@ func postMessage(w http.ResponseWriter, r *http.Request) {
 	var newMessage NewMessage
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(reqBody, &newMessage)
-
+	//aa
 	// You might want to use real timestamp and user name here
 	newMessage.Timestamp = time.Now().Format(time.RFC3339)
 	newMessage.Name = "Some User"
