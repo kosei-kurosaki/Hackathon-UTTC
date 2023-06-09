@@ -112,7 +112,7 @@ func handlePostMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// メッセージをデータベースに保存するコードを後で書く
+	// メッセージをデータベースに保存するコードを後で書
 
 	// レスポンスとしてメッセージをエンコードしてクライアントに送信
 	json.NewEncoder(w).Encode(msg)
