@@ -151,6 +151,7 @@ func postMessage(w http.ResponseWriter, r *http.Request) {
 	// リクエストからMessageを取得
 	var msg Message
 	err := json.NewDecoder(r.Body).Decode(&msg)
+	fmt.Printf("リクエストをmsgに入れ流ことはできた")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -172,6 +173,9 @@ func postMessage(w http.ResponseWriter, r *http.Request) {
 	// レスポンスの作成と送信
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(msg)
+}
+func deleteMessage(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func generateID() string {
@@ -199,6 +203,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		postMessage(w, r)
 	case "PUT":
 		updateMessage(w, r)
+	case "DELETE":
+		deleteMessage(w, r)
+
 	default:
 		http.Error(w, "Method not supported", http.StatusMethodNotAllowed)
 	}
