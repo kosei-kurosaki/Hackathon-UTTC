@@ -65,12 +65,46 @@ var messages []Message
 
 func getMessages(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
+	rows, err := db.Query("SELECT * FROM messages")
+
+	if err != nil {
+		log.Printf("fail: db.Query, %v\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(messages)
+
+	//2-3
+	messages := make([]Message, 0)
+	for rows.Next() {
+		var m Message
+		if err := rows.Scan(&m.ID, &m.Name, &m.Message, &m.Timestamp, &m.UserID); err != nil {
+			log.Printf("fail: rows.Scan, %v\n", err)
+
+			if err := rows.Close(); err != nil { // 500を返して終了するが、その前にrowsのClose処理が必要
+				log.Printf("fail: rows.Close(), %v\n", err)
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		messages = append(messages, m)
+	}
+
+	//2-4
+	bytes, err := json.Marshal(messages)
+	if err != nil {
+		log.Printf("fail: json.Marshal, %v\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_, err = w.Write(bytes)
+	if err != nil {
+		log.Printf("fail: w.Write, %v\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	return
 
 }
 
@@ -128,7 +162,7 @@ func generateID() string {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:63738")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:59171")
 	w.Header().Set("Access-Control-Allow-Origin", "https://hackathon-uttc-ngo5uabimq-uc.a.run.app")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
