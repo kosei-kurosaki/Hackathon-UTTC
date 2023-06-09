@@ -28,6 +28,7 @@ func init() {
 	mysqlHost := os.Getenv("MYSQL_HOST")
 	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
 	//1-2
+
 	_db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s/%s", mysqlUser, mysqlUserPwd, mysqlHost, mysqlDatabase))
 	if err != nil {
 		log.Fatalf("fail: sql.Open, %v\n", err)
@@ -35,6 +36,7 @@ func init() {
 	//1-3
 	if err := _db.Ping(); err != nil {
 		log.Fatalf("fail: _db.Ping, %v\n", err)
+
 	}
 	db = _db
 }
