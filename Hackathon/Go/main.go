@@ -64,6 +64,7 @@ var newID int = 1
 var messages []Message
 
 func getMessages(w http.ResponseWriter, r *http.Request) {
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(messages)
 }
@@ -77,7 +78,7 @@ func handlePostMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// メッセージをデータベースに保存するコードを後で書く
+	// メッセージをでータベースに保存するコードを後で書く
 
 	// レスポンスとしてメッセージをエンコードしてクライアントに送信
 	json.NewEncoder(w).Encode(msg)
@@ -124,7 +125,6 @@ func generateID() string {
 func main() {
 	router := mux.NewRouter()
 
-	messages = append(messages, Message{ID: "1", Name: "John", Message: "Hello, world!", Timestamp: "2023-06-07T09:30:00Z"})
 	router.HandleFunc("/messages", handlePostMessage)
 	router.HandleFunc("/messages", getMessages).Methods("GET")
 	router.HandleFunc("/messages/{id}", updateMessage).Methods("PUT")
