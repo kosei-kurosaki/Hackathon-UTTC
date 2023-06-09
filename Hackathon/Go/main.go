@@ -28,7 +28,7 @@ func init() {
 	}
 	//1-1
 	mysqlUser := os.Getenv("MYSQL_USER")
-	mysqlUserPwd := os.Getenv("MYSQL_PASSWORD")
+	mysqlUserPwd := os.Getenv("MYSQL_PWD")
 	mysqlHost := os.Getenv("MYSQL_HOST")
 	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
 	//1-2
@@ -117,7 +117,7 @@ func handlePostMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// メッセージをでータベースに保存するコードを後で書く
+	// メッセージをデータベースに保存するコードを後で書く
 
 	// レスポンスとしてメッセージをエンコードしてクライアントに送信
 	json.NewEncoder(w).Encode(msg)
