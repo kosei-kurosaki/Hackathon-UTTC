@@ -65,8 +65,13 @@ var messages []Message
 
 func getMessages(w http.ResponseWriter, r *http.Request) {
 
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(messages)
+
 }
 
 func handlePostMessage(w http.ResponseWriter, r *http.Request) {
@@ -122,12 +127,36 @@ func generateID() string {
 	return id.String()
 }
 
+func handler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:63738")
+	w.Header().Set("Access-Control-Allow-Origin", "https://hackathon-uttc-ngo5uabimq-uc.a.run.app")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Content-Type", "application/json")
+
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	switch r.Method {
+	case "GET":
+		getMessages(w, r)
+	case "POST":
+		postMessage(w, r)
+	case "PUT":
+		updateMessage(w, r)
+	default:
+		http.Error(w, "Method not supported", http.StatusMethodNotAllowed)
+	}
+}
+
 func main() {
 	router := mux.NewRouter()
-
-	router.HandleFunc("/messages", handlePostMessage)
-	router.HandleFunc("/messages", getMessages).Methods("GET")
-	router.HandleFunc("/messages/{id}", updateMessage).Methods("PUT")
-	router.HandleFunc("/messages", postMessage).Methods("POST")
+	router.HandleFunc("/messages", handler)
+	//router.HandleFunc("/messages", handlePostMessage)
+	//router.HandleFunc("/messages", getMessages).Methods("GET")
+	//router.HandleFunc("/messages/{id}", updateMessage).Methods("PUT")
+	//router.HandleFunc("/messages", postMessage).Methods("POST")
 
 }
