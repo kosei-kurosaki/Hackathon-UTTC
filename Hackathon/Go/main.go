@@ -201,4 +201,8 @@ func main() {
 	//router.HandleFunc("/messages/{id}", updateMessage).Methods("PUT")
 	//router.HandleFunc("/messages", postMessage).Methods("POST")
 
+	log.Println("Listening...")
+	if err:= http.ListenAndServe(":8080", nil); err != nil {
+		log.Fatal(err)
+	}
 }
