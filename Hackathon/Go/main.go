@@ -6,7 +6,6 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 	"github.com/oklog/ulid/v2"
 	"io/ioutil"
 	"log"
@@ -21,11 +20,7 @@ import (
 var db *sql.DB
 
 func init() {
-	err := godotenv.Load(".env_mysql")
-	if err != nil {
-		log.Fatalf("fail: getenv, %v\n", err)
 
-	}
 	//1-1
 	mysqlUser := os.Getenv("MYSQL_USER")
 	mysqlUserPwd := os.Getenv("MYSQL_PWD")
