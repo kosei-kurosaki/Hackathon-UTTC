@@ -185,9 +185,22 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("hello!!!!!!"))
+		return
+	}
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+}
+
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/messages", handler)
+	router.HandleFunc("/hello", helloHandler)
 	//router.HandleFunc("/messages", handlePostMessage)
 	//router.HandleFunc("/messages", getMessages).Methods("GET")
 	//router.HandleFunc("/messages/{id}", updateMessage).Methods("PUT")
