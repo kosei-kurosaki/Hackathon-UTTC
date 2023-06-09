@@ -22,6 +22,10 @@ var db *sql.DB
 
 func init() {
 	err := godotenv.Load(".env_mysql")
+	if err != nil {
+		log.Fatalf("fail: getenv, %v\n", err)
+
+	}
 	//1-1
 	mysqlUser := os.Getenv("MYSQL_USER")
 	mysqlUserPwd := os.Getenv("MYSQL_PASSWORD")
@@ -126,9 +130,4 @@ func main() {
 	router.HandleFunc("/messages/{id}", updateMessage).Methods("PUT")
 	router.HandleFunc("/messages", postMessage).Methods("POST")
 
-	err := http.ListenAndServe(":8008", router)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
 }
