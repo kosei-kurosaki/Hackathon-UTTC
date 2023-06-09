@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 	"github.com/oklog/ulid/v2"
 	"log"
 	"math/rand"
@@ -105,21 +106,46 @@ func getMessages(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateMessage(w http.ResponseWriter, r *http.Request) {
-	// リクエストからMessageを取得
-	var msg MessageEdit
-	err := json.NewDecoder(r.Body).Decode(&msg)
+	//// リクエストからMessageを取得
+	//var msg MessageEdit
+	//err := json.NewDecoder(r.Body).Decode(&msg)
+	//if err != nil {
+	//	http.Error(w, err.Error(), http.StatusBadRequest)
+	//	return
+	//}
+	//
+	//// データベースのメッセージを更新
+	//_, err = db.Exec(`UPDATE messages SET message = ? WHERE id = ?`, msg.Message, msg.ID)
+	//if err != nil {
+	//	http.Error(w, err.Error(), http.StatusInternalServerError)
+	//	return
+	//}
+	params := mux.Vars(r)
+
+	// リクエストボディからデータを読み込みます
+	var updatedMessage Message
+	err := json.NewDecoder(r.Body).Decode(&updatedMessage)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	// データベースのメッセージを更新
-	_, err = db.Exec(`UPDATE messages SET message = ? WHERE id = ?`, msg.Message, msg.ID)
+	// SQLクエリを実行します
+	stmt, err := db.Prepare("UPDATE messages SET Message = ? WHERE ID = ?")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(updatedMessage.Message, params["editingMessageId"])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// 成功した場合は200ステータスコードを返します
+	w.WriteHeader(http.StatusOK)
 }
 
 func postMessage(w http.ResponseWriter, r *http.Request) {
