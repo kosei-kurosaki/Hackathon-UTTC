@@ -116,7 +116,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// SQLクエリを実行します
-	stmt, err := db.Prepare("UPDATE messages SET Message = updatedMessage.message WHERE ID = updatedMessage.id")
+	stmt, err := db.Prepare("UPDATE messages SET Message = (updatedMessage.message+"編集済み") WHERE ID = updatedMessage.id")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -189,7 +189,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "*")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Credential", "true")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method == "OPTIONS" {
