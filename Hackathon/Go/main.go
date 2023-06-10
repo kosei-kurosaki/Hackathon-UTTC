@@ -116,7 +116,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// SQLクエリを実行します
-	stmt, err := db.Prepare("UPDATE messages SET Message = updatedMessage.message WHERE ID = updatedMessage.id")
+	stmt, err := db.Prepare("UPDATE messages SET message = ? WHERE id = ?")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -163,7 +163,7 @@ func postMessage(w http.ResponseWriter, r *http.Request) {
 
 func deleteMessage(w http.ResponseWriter, r *http.Request) {
 	deleteid := r.URL.Query().Get("messageid")
-	delForm, err := db.Prepare("DELETE FROM messages WHERE id=deleteid")
+	delForm, err := db.Prepare("DELETE FROM messages WHERE id = ?")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -192,7 +192,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "*")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Credential", "true")
-	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method == "OPTIONS" {
