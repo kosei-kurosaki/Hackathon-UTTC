@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	_ "strconv"
+	"strings"
 	"time"
 )
 
@@ -54,7 +55,8 @@ type MessageEdit struct {
 type NewMessage struct {
 	Name      string `json:"name"`
 	Message   string `json:"message"`
-	Timestamp string `json:"timestamp"`
+	UserId    string `json:"userid"`
+	ChannelId string `json:"channelid"`
 }
 
 var newID int = 1
@@ -149,21 +151,21 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 
 func postMessage(w http.ResponseWriter, r *http.Request) {
 	// リクエストからMessageを取得
-	var msg Message
+	var msg NewMessage
 	err := json.NewDecoder(r.Body).Decode(&msg)
 	fmt.Printf("リクエストをmsgに入れ流ことはできた")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	// Timestampの設定
-	msg.Timestamp = time.Now().Format(time.RFC3339)
+	var Timestamp = time.Now().Format(time.RFC3339)
 	//IDの設定
-	msg.ID = generateID()
+	var ID = generateID()
+	fmt.Print(ID, Timestamp)
 	// データベースへの書き込み
 	_, err = db.Exec(`INSERT INTO messages (id, name, message, timestamp, userid, channelid) VALUES (?, ?, ?, ?, ?, ?)`,
-		msg.ID, msg.Name, msg.Message, msg.Timestamp, msg.UserID, msg.ChannelId)
+		ID, msg.Name, msg.Message, Timestamp, msg.UserId, msg.ChannelId)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -174,8 +176,24 @@ func postMessage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(msg)
 }
-func deleteMessage(w http.ResponseWriter, r *http.Request) {
 
+func deleteMessage(w http.ResponseWriter, r *http.Request) {
+	splitURL := strings.Split(r.URL.Path, "/")
+	deleteid := splitURL[len(splitURL)-1]
+
+	delForm, err := db.Prepare("DELETE FROM Messages WHERE id=deleteid")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	_, err = delForm.Exec(deleteid)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "Failed to delete message with ID = %s", deleteid)
+		return
+	}
+
+	fmt.Fprintf(w, "Message with ID = %s was deleted", deleteid)
 }
 
 func generateID() string {
@@ -188,6 +206,7 @@ func generateID() string {
 func handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "*")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Credential", "true")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Content-Type", "application/json")
 
