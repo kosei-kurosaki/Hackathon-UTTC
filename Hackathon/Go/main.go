@@ -107,22 +107,7 @@ func getMessages(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateMessage(w http.ResponseWriter, r *http.Request) {
-	//// リクエストからMessageを取得
-	//var msg MessageEdit
-	//err := json.NewDecoder(r.Body).Decode(&msg)
-	//if err != nil {
-	//	http.Error(w, err.Error(), http.StatusBadRequest)
-	//	return
-	//}
-	//
-	//// データベースのメッセージを更新
-	//_, err = db.Exec(`UPDATE messages SET message = ? WHERE id = ?`, msg.Message, msg.ID)
-	//if err != nil {
-	//	http.Error(w, err.Error(), http.StatusInternalServerError)
-	//	return
-	//}
 
-	// リクエストボディからデータを読み込みます
 	// リクエストボディからデータを読み込みます
 	var updatedMessage MessageEdit
 	err := json.NewDecoder(r.Body).Decode(&updatedMessage)
@@ -162,7 +147,7 @@ func postMessage(w http.ResponseWriter, r *http.Request) {
 	var Timestamp = time.Now().Format(time.RFC3339)
 	//IDの設定
 	var ID = generateID()
-	fmt.Print(ID, Timestamp)
+	fmt.Printf(ID, Timestamp)
 	// データベースへの書き込み
 	_, err = db.Exec(`INSERT INTO messages (id, name, message, timestamp, userid, channelid) VALUES (?, ?, ?, ?, ?, ?)`,
 		ID, msg.Name, msg.Message, Timestamp, msg.UserId, msg.ChannelId)
