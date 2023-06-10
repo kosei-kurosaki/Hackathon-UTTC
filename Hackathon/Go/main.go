@@ -116,7 +116,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// SQLクエリを実行します
-	stmt, err := db.Prepare("UPDATE messages SET Message = (updatedMessage.message+"編集済み") WHERE ID = updatedMessage.id")
+	stmt, err := db.Prepare("UPDATE messages SET Message = updatedMessage.message WHERE ID = updatedMessage.id")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
