@@ -190,7 +190,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "*")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Credential", "true")
-	w.Header().Set("Access-Control-Allow-Methods", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE")
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method == "OPTIONS" {
