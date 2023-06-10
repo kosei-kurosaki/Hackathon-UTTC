@@ -163,7 +163,7 @@ func postMessage(w http.ResponseWriter, r *http.Request) {
 
 func deleteMessage(w http.ResponseWriter, r *http.Request) {
 	deleteid := r.URL.Query().Get("messageid")
-	delForm, err := db.Prepare("DELETE FROM Messages WHERE id=deleteid")
+	delForm, err := db.Prepare("DELETE FROM messages WHERE id=deleteid")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -177,6 +177,8 @@ func deleteMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, "Message with ID = %s was deleted", deleteid)
+	// 成功した場合は200ステータスコードを返します
+	w.WriteHeader(http.StatusOK)
 }
 
 func generateID() string {
