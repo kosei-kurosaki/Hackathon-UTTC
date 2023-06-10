@@ -134,7 +134,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func postMessage(w http.ResponseWriter, r *http.Request) {
-	// リクエストからMessageを取得
+	// リクiiエストからMessageを取得
 	var msg NewMessage
 	err := json.NewDecoder(r.Body).Decode(&msg)
 	fmt.Printf("リクエストをmsgに入れ流ことはできた")
