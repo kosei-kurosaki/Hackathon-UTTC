@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	_ "strconv"
-	"strings"
 	"time"
 )
 
@@ -163,9 +162,7 @@ func postMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteMessage(w http.ResponseWriter, r *http.Request) {
-	splitURL := strings.Split(r.URL.Path, "/")
-	deleteid := splitURL[len(splitURL)-1]
-
+	deleteid := r.URL.Query().Get("messageid")
 	delForm, err := db.Prepare("DELETE FROM Messages WHERE id=deleteid")
 	if err != nil {
 		panic(err.Error())
