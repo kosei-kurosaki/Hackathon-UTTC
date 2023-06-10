@@ -169,6 +169,7 @@ func deleteMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = delForm.Exec(deleteid)
+	fmt.Print(deleteid)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Failed to delete message with ID = %s", deleteid)
