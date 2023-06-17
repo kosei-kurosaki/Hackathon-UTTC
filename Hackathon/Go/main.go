@@ -86,7 +86,7 @@ func getMessages(w http.ResponseWriter, r *http.Request) {
 		messages = append(messages, m)
 	}
 
-	//2-4
+	//2-4--
 	bytes, err := json.Marshal(messages)
 	if err != nil {
 		log.Printf("fail: json.Marshal, %v\n", err)
